@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // =================================================================
-    // BẠN CÓ THỂ DỄ DÀNG TÙY CHỈNH TẠI ĐÂY
+    // LỜI CHÚC HAY NHẤT (Đầy đủ ý, vừa vặn, dễ thương)
     // =================================================================
     const config = {
-        recipientName: "cô gái của anh",
-        letterMessage: `Nhân ngày 20/10, anh muốn gửi đến em tất cả những gì dịu dàng và tốt đẹp nhất.\n\nCảm ơn em đã đến và thắp sáng cuộc đời anh bằng sự ấm áp và nụ cười rạng rỡ. Chúc em của anh sẽ luôn xinh đẹp, an nhiên và được yêu thương. Mọi bão giông ngoài kia, hãy để anh lo.`,
-        signature: "Thương em nhất!"
+        recipientName: "một nửa thế giới siêu đáng yêu",
+        letterMessage: `Nhân ngày 20/10, xin gửi những lời chúc ngọt ngào và chân thành nhất đến các bạn nữ xinh đẹp.\n\nChúc các bạn một ngày thật vui vẻ, luôn cười tươi như hoa, an nhiên như mây và hạnh phúc trọn vẹn. Hãy luôn nhớ rằng bạn là một ngôi sao lấp lánh và xứng đáng nhận được tất cả những điều tuyệt vời nhất trên đời!`,
+        signature: "Gửi ngàn tim! ❤️"
     };
     // =================================================================
     // KẾT THÚC PHẦN TÙY CHỈNH
@@ -19,9 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const envelopeContainer = document.getElementById('envelope-container');
     const envelopeWrapper = document.querySelector('.envelope-wrapper');
     const backgroundMusic = document.getElementById('background-music');
+    const letter = document.querySelector('.letter');
     const letterText = document.getElementById('letter-text');
     
     let musicStarted = false;
+    let letterOpened = false;
+    const typingSpeed = 50; // Tốc độ viết chữ (ms)
 
     function playMusic() {
         if (!musicStarted) {
@@ -31,39 +34,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // KỊCH BẢN CHÍNH
+    // Kịch bản chính
     setTimeout(() => {
         loader.style.display = 'none';
-        
         mainContent.classList.remove('hidden');
         giftContainer.classList.remove('hidden');
-        
         playMusic();
-
-        setTimeout(() => {
-            giftBox.classList.add('open');
-        }, 1000);
-
+        setTimeout(() => giftBox.classList.add('open'), 1000);
         setTimeout(() => {
             giftContainer.classList.add('hidden');
             envelopeContainer.classList.remove('hidden');
         }, 3000);
-
     }, 4000);
 
     // Sự kiện mở phong bì
     envelopeWrapper.addEventListener('click', () => {
-        envelopeWrapper.classList.toggle('open');
-        if (envelopeWrapper.classList.contains('open')) {
-            setupLetter();
+        if (!letterOpened) {
+            envelopeWrapper.classList.add('open');
+            letterOpened = true;
+            setTimeout(typeLetter, 800); // Đợi phong bì rơi rồi mới viết
         }
     });
     
-    // Thiết lập nội dung lá thư
-    function setupLetter() {
-        letterText.innerHTML = `<strong>Gửi ${config.recipientName},</strong><p>${config.letterMessage.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p><p class="signature">${config.signature}</p>`;
+    // Hàm viết thư
+    function typeLetter() {
+        const fullMessage = `<strong>Gửi ${config.recipientName},</strong><br><br>${config.letterMessage.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}<br><br><p class="signature">${config.signature}</p>`;
+        
+        letter.style.opacity = '1';
+        letterText.innerHTML = '<span>.</span>'; 
+        let initialHeight = letterText.scrollHeight;
+        letter.style.height = `${initialHeight}px`;
+        letterText.innerHTML = '';
+
+        let i = 0;
+        function typeWriter() {
+            if (i < fullMessage.length) {
+                if (fullMessage[i] === '<') {
+                    const closingTagIndex = fullMessage.indexOf('>', i);
+                    if (closingTagIndex !== -1) {
+                        letterText.innerHTML += fullMessage.substring(i, closingTagIndex + 1);
+                        i = closingTagIndex + 1;
+                    }
+                } else {
+                    letterText.innerHTML += `<span>${fullMessage[i]}</span>`;
+                    i++;
+                }
+
+                let currentHeight = letterText.scrollHeight;
+                letter.style.height = `${currentHeight}px`;
+                
+                setTimeout(typeWriter, typingSpeed);
+            }
+        }
+        typeWriter();
     }
 
-    // Fallback để bật nhạc nếu trình duyệt chặn
     document.body.addEventListener('click', playMusic, { once: true });
 });
